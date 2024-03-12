@@ -1,0 +1,24 @@
+# Binaries
+/bin/
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below if you use Go modules)
+/vendor/
+
+# IDE/editor configs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.env 
+prd.md
