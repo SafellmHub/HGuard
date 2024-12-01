@@ -1,3 +1,3 @@
 package metrics
 
-// Placeholder for metrics and Prometheus setup
+//metrics and Prometheus setup

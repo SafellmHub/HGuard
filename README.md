@@ -175,6 +175,34 @@ To secure your HallucinationGuard server, set an API key as an environment varia
 - If the key is not set, the server will log a warning and allow all requests (for development only).
 - For production, always set an API key!
 
+## Policy Management via Config
+
+HallucinationGuard supports config-based policy management. You can define tool policies in a YAML file without changing code or recompiling.
+
+### Edit Policies
+
+1. Open `internal/config/policies.yaml` in your editor.
+2. Add, remove, or change policies as needed. Example:
+   ```yaml
+   policies:
+     - tool_name: get_weather
+       type: ALLOW
+     - tool_name: transfer_money
+       type: REJECT
+     - tool_name: get_whether
+       type: REWRITE
+   ```
+3. Save the file and restart the server for changes to take effect.
+
+### Policy Types
+
+- `ALLOW`: Approve the tool call if valid.
+- `REJECT`: Block the tool call.
+- `REWRITE`: Automatically rewrite the tool call if a correction is available (e.g., typo fix).
+- `LOG`: Approve the call but flag it for logging/monitoring.
+
+> **Note:** For now, the server must be restarted after editing the policy file. (Hot-reload can be added in the future.)
+
 ## License
 
 See [LICENSE](LICENSE).

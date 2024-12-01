@@ -1,6 +1,6 @@
 package fuzzy
 
-// Placeholder for fuzzy matching logic
+//todo?: Placeholder for fuzzy matching logic
 
 // LevenshteinDistance computes the Levenshtein distance between two strings
 func LevenshteinDistance(a, b string) int {

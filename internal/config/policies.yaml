@@ -1,0 +1,7 @@
+policies:
+  - tool_name: get_weather
+    type: ALLOW
+  - tool_name: transfer_money
+    type: REJECT
+  - tool_name: get_whether
+    type: REWRITE

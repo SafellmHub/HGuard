@@ -59,7 +59,7 @@ func ValidateParameters(schema ToolSchema, params map[string]interface{}) error 
 				if paramSchema.MaxLength > 0 && len(str) > paramSchema.MaxLength {
 					return fmt.Errorf("parameter %s exceeds max length", paramName)
 				}
-				// Pattern and Enum checks can be added here
+				// I can use Pattern and Enum checks here
 			case "number":
 				_, ok1 := value.(float64)
 				_, ok2 := value.(int)

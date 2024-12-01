@@ -1,26 +1,35 @@
 package policy
 
 import (
+	"os"
+
 	"github.com/fishonamos/hallucination-shield/internal/core/model"
+	"gopkg.in/yaml.v3"
 )
 
 // PolicyType defines the type of policy action
 // (REJECT, REWRITE, LOG, ALLOW, etc.)
 type PolicyType string
 
+type PolicyAction string
+
 const (
 	PolicyReject  PolicyType = "REJECT"
 	PolicyRewrite PolicyType = "REWRITE"
 	PolicyLog     PolicyType = "LOG"
 	PolicyAllow   PolicyType = "ALLOW"
+
+	ActionNone      PolicyAction = "none"
+	ActionRejected  PolicyAction = "rejected"
+	ActionRewritten PolicyAction = "rewritten"
+	ActionLogged    PolicyAction = "logged"
+	ActionApproved  PolicyAction = "approved"
 )
 
 // Policy defines a guardrail policy for a tool
-// For MVP, only basic fields are included
-// (extend as needed for user/role/context-based policies)
 type Policy struct {
-	ToolName string
-	Type     PolicyType
+	ToolName string     `yaml:"tool_name"`
+	Type     PolicyType `yaml:"type"`
 }
 
 // In-memory policy registry
@@ -43,4 +52,23 @@ func ApplyPolicy(tc model.ToolCall) PolicyType {
 		return p.Type
 	}
 	return PolicyAllow // Default: allow if no policy is set
+}
+
+// LoadPoliciesFromYAML
+func LoadPoliciesFromYAML(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	var data struct {
+		Policies []Policy `yaml:"policies"`
+	}
+	if err := yaml.NewDecoder(f).Decode(&data); err != nil {
+		return err
+	}
+	for _, p := range data.Policies {
+		RegisterPolicy(p)
+	}
+	return nil
 }

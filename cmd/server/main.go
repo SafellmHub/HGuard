@@ -76,18 +76,13 @@ func apiKeyMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func registerExampleSchemasAndPolicies() {
+func registerExampleSchemas() {
 	schema.RegisterToolSchema(schema.ToolSchema{
 		Name: "get_weather",
 		Parameters: map[string]schema.ParameterSchema{
 			"location": {Type: "string", Required: true, MaxLength: 100},
 			"units":    {Type: "string", Required: false, Enum: []string{"celsius", "fahrenheit"}},
 		},
-	})
-
-	policy.RegisterPolicy(policy.Policy{
-		ToolName: "get_weather",
-		Type:     policy.PolicyAllow,
 	})
 
 	schema.RegisterToolSchema(schema.ToolSchema{
@@ -99,16 +94,16 @@ func registerExampleSchemasAndPolicies() {
 			"currency": {Type: "string", Required: true, Enum: []string{"usd", "eur", "gbp"}},
 		},
 	})
-
-	policy.RegisterPolicy(policy.Policy{
-		ToolName: "transfer_money",
-		Type:     policy.PolicyReject, // Example: block money transfers by default
-	})
 }
 
 func main() {
 	logging.Info("HallucinationGuard server starting on :8080 ...")
-	registerExampleSchemasAndPolicies()
+	registerExampleSchemas()
+
+	if err := policy.LoadPoliciesFromYAML("internal/config/policies.yaml"); err != nil {
+		logging.Error("Failed to load policies: %v", err)
+		os.Exit(1)
+	}
 
 	http.HandleFunc("/api/v1/validate", rateLimitMiddleware(apiKeyMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		logging.Info("Received validation request from %s", r.RemoteAddr)

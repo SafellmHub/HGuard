@@ -1,3 +1,3 @@
 # Scripts
 
-Utility and DevOps scripts for HallucinationGuard.
+Utility / DevOps scripts for HallucinationGuard.

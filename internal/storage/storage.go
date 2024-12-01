@@ -1,3 +1,3 @@
 package storage
 
-// Placeholder for database/cache logic
+// database/cache logic

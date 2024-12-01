@@ -1,3 +1,3 @@
 package openai
 
-// Placeholder for OpenAI integration adapter
+// OpenAI integration adapter

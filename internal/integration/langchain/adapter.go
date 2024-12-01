@@ -1,3 +1,3 @@
 package langchain
 
-// Placeholder for LangChain integration adapter
+//LangChain integration adapter

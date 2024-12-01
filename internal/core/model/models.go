@@ -29,4 +29,5 @@ type ValidationResult struct {
 	Modifications       map[string]interface{} `json:"modifications,omitempty"`
 	ExecutionAllowed    bool                   `json:"execution_allowed"`
 	SuggestedCorrection *ToolCall              `json:"suggested_correction,omitempty"`
+	PolicyAction        string                 `json:"policy_action,omitempty"`
 }

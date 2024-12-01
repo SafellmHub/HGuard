@@ -19,6 +19,27 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 			knownNames = append(knownNames, name)
 		}
 		if suggestion, _ := fuzzy.FuzzyMatchToolName(tc.Name, knownNames, 2); suggestion != "" {
+			// Check if policy for this tool is REWRITE
+			p, hasPolicy := policy.GetPolicy(suggestion)
+			if hasPolicy && p.Type == policy.PolicyRewrite {
+				// Rewrite and approve
+				return model.ValidationResult{
+					ToolCallID:       tc.ID,
+					Status:           "rewritten",
+					Confidence:       0.95,
+					Reason:           fmt.Sprintf("Tool name rewritten to '%s' by policy", suggestion),
+					ExecutionAllowed: true,
+					PolicyAction:     string(policy.ActionRewritten),
+					Modifications:    map[string]interface{}{"name": suggestion},
+					SuggestedCorrection: &model.ToolCall{
+						ID:         tc.ID,
+						Name:       suggestion,
+						Parameters: tc.Parameters,
+						Context:    tc.Context,
+						Timestamp:  tc.Timestamp,
+					},
+				}
+			}
 			return model.ValidationResult{
 				ToolCallID: tc.ID,
 				Status:     "rejected",
@@ -32,6 +53,7 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 					Timestamp:  tc.Timestamp,
 				},
 				ExecutionAllowed: false,
+				PolicyAction:     string(policy.ActionRejected),
 			}
 		}
 		return model.ValidationResult{
@@ -40,6 +62,7 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 			Confidence:       1.0,
 			Reason:           "Unknown tool name",
 			ExecutionAllowed: false,
+			PolicyAction:     string(policy.ActionRejected),
 		}
 	}
 
@@ -51,6 +74,7 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 			Confidence:       1.0,
 			Reason:           fmt.Sprintf("Parameter validation failed: %v", err),
 			ExecutionAllowed: false,
+			PolicyAction:     string(policy.ActionRejected),
 		}
 	}
 
@@ -64,14 +88,33 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 			Confidence:       1.0,
 			Reason:           "Policy engine: tool call rejected by policy",
 			ExecutionAllowed: false,
+			PolicyAction:     string(policy.ActionRejected),
 		}
-	case policy.PolicyAllow, policy.PolicyLog, policy.PolicyRewrite:
-		// For MVP, treat LOG and REWRITE as ALLOW (can extend later)
+	case policy.PolicyRewrite:
+		// For now i will just mark as rewritten
+		return model.ValidationResult{
+			ToolCallID:       tc.ID,
+			Status:           "rewritten",
+			Confidence:       1.0,
+			Reason:           "Policy engine: tool call rewritten by policy",
+			ExecutionAllowed: true,
+			PolicyAction:     string(policy.ActionRewritten),
+		}
+	case policy.PolicyLog:
 		return model.ValidationResult{
 			ToolCallID:       tc.ID,
 			Status:           "approved",
 			Confidence:       1.0,
 			ExecutionAllowed: true,
+			PolicyAction:     string(policy.ActionLogged),
+		}
+	case policy.PolicyAllow:
+		return model.ValidationResult{
+			ToolCallID:       tc.ID,
+			Status:           "approved",
+			Confidence:       1.0,
+			ExecutionAllowed: true,
+			PolicyAction:     string(policy.ActionApproved),
 		}
 	default:
 		return model.ValidationResult{
@@ -79,6 +122,7 @@ func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
 			Status:           "approved",
 			Confidence:       1.0,
 			ExecutionAllowed: true,
+			PolicyAction:     string(policy.ActionApproved),
 		}
 	}
 }
