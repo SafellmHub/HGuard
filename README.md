@@ -2,16 +2,6 @@ LLM Tool Guardrails is a lightweight middleware system for detecting and prevent
 
 This project aims to improve the reliability and safety of tool-augmented LLMs by introducing programmatic checks before external tool execution. It supports rule-based and prompt-aware strategies and is compatible with OpenAI function calling, LangChain tools, and similar LLM frameworks.
 
-## Project Structure
-
-- `cmd/` - Entry points for server and CLI
-- `internal/` - Core business logic, APIs, adapters (private)
-- `pkg/` - Public Go packages for SDKs or plugins
-- `scripts/` - Utility and DevOps scripts
-- `deployments/` - Deployment manifests (Docker, K8s, etc.)
-- `test/` - Integration and end-to-end tests
-- `docs/` - Documentation and API specs
-
 ## Getting Started
 
 1. Install Go 1.21+
