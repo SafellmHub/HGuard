@@ -1,5 +1,16 @@
 LLM Tool Guardrails is a lightweight middleware system for detecting and preventing hallucinated tool use in large language models (LLMs). It works by intercepting and validating function/tool calls made by the model, then filtering, rewriting, or blocking hallucinated or invalid ones.
 
+## Why HallucinationGuard is Important
+
+Modern LLMs (like GPT-3, Claude, etc.) can generate tool or API calls that are hallucinated, unsafe, or non-compliant. If executed blindly, these calls can cause security breaches, data loss, financial risk, or compliance violations. HallucinationGuard acts as an automated, real-time firewall for LLM tool use, ensuring:
+
+- **Security:** Prevents LLMs from accessing or leaking sensitive data.
+- **Reliability:** Stops system crashes or errors from malformed tool calls.
+- **Compliance:** Helps organizations meet regulatory requirements (GDPR, SOC2, etc.).
+- **Trust:** Increases user and developer confidence in AI-powered systems.
+
+Without a tool like this, LLMs might call non-existent or dangerous APIs, leak or corrupt data, or cause financial/reputational damage. HallucinationGuard automates validation, rewriting, and blocking of tool calls. This makes LLM-powered applications safer and more reliable.
+
 This project aims to improve the reliability and safety of tool-augmented LLMs by introducing programmatic checks before external tool execution. It supports rule-based and prompt-aware strategies and is compatible with OpenAI function calling, LangChain tools, and similar LLM frameworks.
 
 ## Getting Started
