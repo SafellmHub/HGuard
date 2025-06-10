@@ -1,9 +1,32 @@
 package hallucinationguard
 
 import (
-	"github.com/fishonamos/HGuard/internal/core/model"
-	"github.com/fishonamos/HGuard/internal/core/policy"
-	"github.com/fishonamos/HGuard/internal/schema"
+	"github.com/fishonamos/HGuard/pkg/internal/core/model"
+	"github.com/fishonamos/HGuard/pkg/internal/core/policy"
+	"github.com/fishonamos/HGuard/pkg/internal/schema"
+)
+
+// ToolCall represents a tool call request
+type ToolCall struct {
+	Name       string                 `json:"name"`
+	Parameters map[string]interface{} `json:"parameters"`
+}
+
+// ValidationResult represents the result of validating a tool call
+type ValidationResult struct {
+	ExecutionAllowed    bool      `json:"allowed"`
+	Error               string    `json:"error,omitempty"`
+	PolicyAction        string    `json:"policy_action,omitempty"`
+	SuggestedCorrection *ToolCall `json:"suggested_correction,omitempty"`
+}
+
+// PolicyAction constants
+const (
+	PolicyActionALLOW          = "ALLOW"
+	PolicyActionREJECT         = "REJECT"
+	PolicyActionREWRITE        = "REWRITE"
+	PolicyActionRATE_LIMIT     = "RATE_LIMIT"
+	PolicyActionCONTEXT_REJECT = "CONTEXT_REJECT"
 )
 
 // Guard is the main SDK struct for embedding HallucinationGuard
@@ -26,12 +49,29 @@ func (g *Guard) LoadPoliciesFromFile(path string) error {
 }
 
 // ValidateToolCall validates a tool call using loaded schemas and policies
-func (g *Guard) ValidateToolCall(tc model.ToolCall) model.ValidationResult {
-	return ValidateToolCall(tc)
-}
+func (g *Guard) ValidateToolCall(tc ToolCall) ValidationResult {
+	// Convert to internal model
+	internalCall := model.ToolCall{
+		Name:       tc.Name,
+		Parameters: tc.Parameters,
+	}
 
-// ValidateToolCall is a wrapper for the internal validation logic
-func ValidateToolCall(tc model.ToolCall) model.ValidationResult {
-	// Use the same logic as the REST API/server
-	return schema.ValidateAndPolicy(tc)
+	// Validate using internal logic
+	result := schema.ValidateAndPolicy(internalCall)
+
+	// Convert back to public type
+	validationResult := ValidationResult{
+		ExecutionAllowed: result.ExecutionAllowed,
+		Error:            result.Reason,
+		PolicyAction:     string(result.PolicyAction),
+	}
+
+	if result.SuggestedCorrection != nil {
+		validationResult.SuggestedCorrection = &ToolCall{
+			Name:       result.SuggestedCorrection.Name,
+			Parameters: result.SuggestedCorrection.Parameters,
+		}
+	}
+
+	return validationResult
 }

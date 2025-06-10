@@ -10,5 +10,3 @@ const (
 	PolicyActionRATE_LIMIT     PolicyAction = "RATE_LIMIT"
 	PolicyActionCONTEXT_REJECT PolicyAction = "CONTEXT_REJECT"
 )
-
-// ... rest of the file ...
