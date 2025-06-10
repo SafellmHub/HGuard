@@ -1,4 +1,4 @@
-module github.com/fishonamos/hallucination-shield
+module github.com/fishonamos/HGuard
 
 go 1.21
 
