@@ -55,28 +55,6 @@ func main() {
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
-
-- [GitHub Issues](https://github.com/fishonamos/HGuard/issues)
-- [Discord Community](https://discord.gg/hallucinationguard)
-
-## Why HallucinationGuard?
-
-LLMs can sometimes hallucinate tool calls - attempting to use tools that don't exist or aren't authorized. This can lead to:
-
-- Security vulnerabilities
-- System errors
-- Unauthorized access
-- Resource abuse
-
-HallucinationGuard prevents these issues by:
-
-1. Validating all tool calls against defined schemas
-2. Enforcing access policies
-3. Correcting common typos
-4. Rate limiting tool usage
-5. Tracking call context
-
 ## Community
 
 - [Discord](https://discord.gg/hallucinationguard) - Join our community
