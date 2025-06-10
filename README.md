@@ -50,15 +50,6 @@ func main() {
 - **Context Awareness**: Make validation decisions based on call history
 - **Hallucination Prevention**: Block non-existent or unauthorized tools
 
-## Documentation
-
-- [API Reference](https://pkg.go.dev/github.com/fishonamos/HGuard)
-- [Getting Started Guide](docs/getting-started.md)
-- [Examples](example/)
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
@@ -85,14 +76,6 @@ HallucinationGuard prevents these issues by:
 3. Correcting common typos
 4. Rate limiting tool usage
 5. Tracking call context
-
-## Key Benefits
-
-- **Security**: Prevent unauthorized tool access
-- **Reliability**: Block invalid tool calls
-- **User Experience**: Auto-correct common mistakes
-- **Resource Control**: Prevent tool abuse
-- **Flexibility**: Define your own schemas and policies
 
 ## Community
 
