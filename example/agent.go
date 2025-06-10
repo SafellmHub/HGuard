@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"os"
 
 	"github.com/fishonamos/HGuard/internal/core/model"
 	"github.com/fishonamos/HGuard/pkg/hallucinationguard"
@@ -30,7 +31,7 @@ type AtomaResponse struct {
 }
 
 func callLLM(prompt string) (model.ToolCall, error) {
-	apiKey := "ecXtlnDvomQXCPDIv6ch3yUs2pLYEf" // Your Atoma API key
+	apiKey := os.Getenv("ATOMA_API_KEY")
 	systemPrompt := `You are a tool-using assistant. When asked a question, respond ONLY with a JSON object describing the tool call you would make, e.g.: {"id": "call_001", "name": "weather", "parameters": {"location": "London", "unit": "C"}}.`
 
 	reqBody := map[string]interface{}{
