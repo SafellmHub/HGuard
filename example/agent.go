@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
-	"github.com/fishonamos/hallucination-shield/pkg/hallucinationguard"
+	"github.com/fishonamos/HGuard/internal/core/model"
+	"github.com/fishonamos/HGuard/pkg/hallucinationguard"
 )
 
 type LLMResponse struct {

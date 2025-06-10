@@ -255,3 +255,24 @@ See `schemas.yaml` and `policies.yaml` for examples.
 ## License
 
 See [LICENSE](LICENSE).
+
+## Installation
+
+Since this is a private module, you'll need to configure Git to use authentication when accessing GitHub. Run the following command:
+
+```bash
+# Replace YOUR_GITHUB_TOKEN with a personal access token that has 'repo' scope
+git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+```
+
+Then you can install the module:
+
+```bash
+go get github.com/fishonamos/HGuard@v0.1.0
+```
+
+### Creating a GitHub Token
+
+1. Go to GitHub Settings -> Developer Settings -> Personal Access Tokens
+2. Generate a new token with the 'repo' scope
+3. Copy the token and use it as GITHUB_TOKEN in the configuration above
