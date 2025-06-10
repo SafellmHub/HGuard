@@ -3,7 +3,7 @@ package policy
 import (
 	"os"
 
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
+	"github.com/fishonamos/HGuard/internal/core/model"
 	"gopkg.in/yaml.v3"
 )
 

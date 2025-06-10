@@ -1,9 +1,9 @@
 package hallucinationguard
 
 import (
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
-	"github.com/fishonamos/hallucination-shield/internal/core/policy"
-	"github.com/fishonamos/hallucination-shield/internal/schema"
+	"github.com/fishonamos/HGuard/internal/core/model"
+	"github.com/fishonamos/HGuard/internal/core/policy"
+	"github.com/fishonamos/HGuard/internal/schema"
 )
 
 // Guard is the main SDK struct for embedding HallucinationGuard

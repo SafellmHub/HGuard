@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fishonamos/hallucination-shield/internal/api/rest"
-	"github.com/fishonamos/hallucination-shield/internal/core/policy"
-	"github.com/fishonamos/hallucination-shield/internal/logging"
-	"github.com/fishonamos/hallucination-shield/internal/schema"
+	"github.com/fishonamos/HGuard/internal/api/rest"
+	"github.com/fishonamos/HGuard/internal/core/policy"
+	"github.com/fishonamos/HGuard/internal/logging"
+	"github.com/fishonamos/HGuard/internal/schema"
 )
 
 var apiKey = os.Getenv("HALLUCINATION_GUARD_API_KEY")

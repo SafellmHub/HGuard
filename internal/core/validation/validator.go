@@ -3,10 +3,10 @@ package validation
 import (
 	"fmt"
 
-	"github.com/fishonamos/hallucination-shield/internal/core/fuzzy"
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
-	"github.com/fishonamos/hallucination-shield/internal/core/policy"
-	"github.com/fishonamos/hallucination-shield/internal/schema"
+	"github.com/fishonamos/HGuard/internal/core/fuzzy"
+	"github.com/fishonamos/HGuard/internal/core/model"
+	"github.com/fishonamos/HGuard/internal/core/policy"
+	"github.com/fishonamos/HGuard/internal/schema"
 )
 
 // ValidateToolCall is the main entry point for validating a tool call

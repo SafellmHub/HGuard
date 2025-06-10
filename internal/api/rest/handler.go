@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
-	"github.com/fishonamos/hallucination-shield/internal/core/validation"
-	"github.com/fishonamos/hallucination-shield/internal/logging"
+	"github.com/fishonamos/HGuard/internal/core/model"
+	"github.com/fishonamos/HGuard/internal/core/validation"
+	"github.com/fishonamos/HGuard/internal/logging"
 	"github.com/google/uuid"
 )
 

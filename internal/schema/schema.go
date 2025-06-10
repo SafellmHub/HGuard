@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fishonamos/hallucination-shield/internal/core/fuzzy"
-	"github.com/fishonamos/hallucination-shield/internal/core/model"
-	"github.com/fishonamos/hallucination-shield/internal/core/policy"
+	"github.com/fishonamos/HGuard/internal/core/fuzzy"
+	"github.com/fishonamos/HGuard/internal/core/model"
+	"github.com/fishonamos/HGuard/internal/core/policy"
 	"gopkg.in/yaml.v3"
 )
 
