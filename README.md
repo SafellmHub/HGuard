@@ -1,273 +1,81 @@
-# HGuard - LLM Tool Call Guardrails
+# HallucinationGuard
 
-HGuard is a lightweight middleware system for detecting and preventing hallucinated tool use in large language models (LLMs). It works by intercepting and validating function/tool calls made by the model, then filtering, rewriting, or blocking hallucinated or invalid ones.
+A middleware system for detecting and preventing hallucinated tool use in LLMs. HallucinationGuard acts as a security layer between your LLM and its tools, ensuring that only valid, authorized, and safe tool calls are executed.
 
-## Installation
+## Features
 
-```bash
-go get github.com/fishonamos/HGuard@v0.1.0
-```
+- 🔍 **Tool Validation**: Validate tool calls against defined schemas
+- 🛡️ **Policy Enforcement**: Control tool access with flexible policies
+- ✨ **Typo Correction**: Auto-correct common tool name typos
+- ⏱️ **Rate Limiting**: Prevent tool abuse with rate limiting
+- 🔄 **Context Awareness**: Make decisions based on call history
+- 🚫 **Hallucination Prevention**: Block non-existent or unauthorized tools
 
 ## Quick Start
 
 ```go
-package main
+import "github.com/fishonamos/HGuard"
 
-import (
-    "fmt"
-    "time"
+// Create a new guard instance
+guard := hallucinationguard.New()
 
-    "github.com/fishonamos/HGuard/pkg/hallucinationguard"
-    "github.com/fishonamos/HGuard/internal/core/model"
-)
+// Load your schemas and policies
+guard.LoadSchemasFromFile("schemas.yaml")
+guard.LoadPoliciesFromFile("policies.yaml")
 
-func main() {
-    // Create a new guard instance
-    guard := hallucinationguard.New()
-
-    // Load tool schemas and policies
-    if err := guard.LoadSchemasFromFile("schemas.yaml"); err != nil {
-        panic(err)
-    }
-    if err := guard.LoadPoliciesFromFile("policies.yaml"); err != nil {
-        panic(err)
-    }
-
-    // Validate a tool call
-    toolCall := model.ToolCall{
-        ID: "call_001",
-        Name: "weather",
-        Parameters: map[string]interface{}{
-            "location": "London",
-            "unit": "C",
-        },
-        Context: model.CallContext{
-            UserID: "user123",
-        },
-        Timestamp: time.Now(),
-    }
-
-    result := guard.ValidateToolCall(toolCall)
-    fmt.Printf("Validation result: %+v\n", result)
-
-    if result.ExecutionAllowed {
-        // Execute the tool call
-        fmt.Println("Tool call approved, executing...")
-    } else if result.SuggestedCorrection != nil {
-        // Handle typo correction
-        fmt.Printf("Did you mean: %s?\n", result.SuggestedCorrection.Name)
-    } else {
-        // Handle rejection
-        fmt.Printf("Tool call rejected: %s\n", result.Reason)
-    }
+// Validate a tool call
+result := guard.ValidateToolCall(toolCall)
+if result.ExecutionAllowed {
+    // Execute the tool
 }
 ```
 
-## Configuration Files
+For detailed usage instructions, see our [Getting Started Guide](docs/getting-started.md).
 
-### Tool Schemas (schemas.yaml)
+## Why HallucinationGuard?
 
-Define your tool schemas to validate parameters and types:
+LLMs can sometimes hallucinate tool calls - attempting to use tools that don't exist or aren't authorized. This can lead to:
 
-```yaml
-tools:
-  - name: weather
-    description: Get current weather for a location
-    parameters:
-      - name: location
-        type: string
-        required: true
-        description: City name or coordinates
-      - name: unit
-        type: string
-        required: false
-        enum: [C, F]
-        default: C
-        description: Temperature unit
+- Security vulnerabilities
+- System errors
+- Unauthorized access
+- Resource abuse
 
-  - name: stock_price
-    description: Get stock price for a symbol
-    parameters:
-      - name: symbol
-        type: string
-        required: true
-        description: Stock ticker symbol
-      - name: date
-        type: string
-        required: false
-        format: date
-        description: Historical date (YYYY-MM-DD)
-```
+HallucinationGuard prevents these issues by:
 
-### Policies (policies.yaml)
+1. Validating all tool calls against defined schemas
+2. Enforcing access policies
+3. Correcting common typos
+4. Rate limiting tool usage
+5. Tracking call context
 
-Define policies to control tool access and behavior:
+## Key Benefits
 
-```yaml
-policies:
-  - tool_name: weather
-    type: ALLOW # Always allow weather queries
+- **Security**: Prevent unauthorized tool access
+- **Reliability**: Block invalid tool calls
+- **User Experience**: Auto-correct common mistakes
+- **Resource Control**: Prevent tool abuse
+- **Flexibility**: Define your own schemas and policies
 
-  - tool_name: stock_price
-    type: ALLOW # Allow stock price queries
+## Documentation
 
-  - tool_name: transfer_money
-    type: REJECT # Never allow money transfers
+- [Getting Started Guide](docs/getting-started.md) - Quick start and basic usage
+- [API Reference](docs/api-reference.md) - Detailed API documentation
+- [Examples](example/) - Code examples and use cases
+- [FAQ](docs/faq.md) - Common questions and answers
 
-  - tool_name: wether # Common typo
-    type: REWRITE # Auto-correct to 'weather'
-```
+## Community
 
-## Advanced Usage
-
-### 1. Custom Validation Logic
-
-```go
-// Create a custom validator
-type CustomValidator struct {
-    guard *hallucinationguard.Guard
-}
-
-func (v *CustomValidator) Validate(tc model.ToolCall) model.ValidationResult {
-    // Get base validation from HGuard
-    result := v.guard.ValidateToolCall(tc)
-
-    // Add custom validation logic
-    if tc.Name == "weather" {
-        // Example: Block weather queries for certain locations
-        if loc, ok := tc.Parameters["location"].(string); ok {
-            if loc == "Area 51" {
-                result.Status = "rejected"
-                result.ExecutionAllowed = false
-                result.Reason = "Location not allowed"
-            }
-        }
-    }
-
-    return result
-}
-```
-
-### 2. Handling Typo Corrections
-
-```go
-func handleToolCall(guard *hallucinationguard.Guard, tc model.ToolCall) {
-    result := guard.ValidateToolCall(tc)
-
-    switch result.Status {
-    case "approved":
-        executeToolCall(tc)
-    case "rewritten":
-        if correction := result.SuggestedCorrection; correction != nil {
-            fmt.Printf("Corrected '%s' to '%s'\n", tc.Name, correction.Name)
-            executeToolCall(*correction)
-        }
-    case "rejected":
-        fmt.Printf("Rejected: %s\n", result.Reason)
-    }
-}
-```
-
-### 3. Integration with OpenAI Function Calling
-
-```go
-func validateOpenAIFunctionCall(guard *hallucinationguard.Guard, functionCall openai.FunctionCall) model.ValidationResult {
-    // Convert OpenAI function call to HGuard tool call
-    toolCall := model.ToolCall{
-        ID: functionCall.ID,
-        Name: functionCall.Name,
-        Parameters: functionCall.Arguments,
-        Context: model.CallContext{
-            UserID: "openai_user",
-        },
-        Timestamp: time.Now(),
-    }
-
-    return guard.ValidateToolCall(toolCall)
-}
-```
-
-## Best Practices
-
-1. **Always Validate**: Never execute tool calls without validation
-
-   ```go
-   // ❌ Bad
-   executeToolCall(toolCall)
-
-   // ✅ Good
-   if result := guard.ValidateToolCall(toolCall); result.ExecutionAllowed {
-       executeToolCall(toolCall)
-   }
-   ```
-
-2. **Handle Corrections**: Always check for suggested corrections
-
-   ```go
-   if result.SuggestedCorrection != nil {
-       // Use the corrected version
-       toolCall = *result.SuggestedCorrection
-   }
-   ```
-
-3. **Log Rejections**: Keep track of rejected calls for monitoring
-
-   ```go
-   if !result.ExecutionAllowed {
-       log.Printf("Rejected tool call: %s (Reason: %s)\n",
-           toolCall.Name, result.Reason)
-   }
-   ```
-
-4. **Use Context**: Include user and session context for better validation
-   ```go
-   toolCall.Context = model.CallContext{
-       UserID: "user123",
-       SessionID: "sess456",
-       IP: "192.168.1.1",
-   }
-   ```
-
-## API Reference
-
-### Guard
-
-```go
-type Guard struct {
-    // ... internal fields
-}
-
-// New creates a new Guard instance
-func New() *Guard
-
-// LoadSchemasFromFile loads tool schemas from a YAML file
-func (g *Guard) LoadSchemasFromFile(path string) error
-
-// LoadPoliciesFromFile loads policies from a YAML file
-func (g *Guard) LoadPoliciesFromFile(path string) error
-
-// ValidateToolCall validates a tool call using loaded schemas and policies
-func (g *Guard) ValidateToolCall(tc model.ToolCall) model.ValidationResult
-```
-
-### ValidationResult
-
-```go
-type ValidationResult struct {
-    ToolCallID       string
-    Status           string    // "approved", "rejected", "rewritten"
-    Confidence       float64
-    ExecutionAllowed bool
-    Reason           string
-    SuggestedCorrection *ToolCall
-    PolicyAction     string
-}
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- [Discord](https://discord.gg/hallucinationguard) - Join our community
+- [GitHub Issues](https://github.com/fishonamos/HGuard/issues) - Report bugs or request features
+- [Contributing Guide](CONTRIBUTING.md) - Help improve HallucinationGuard
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+HallucinationGuard is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Inspired by the need for secure LLM tool use
+- Built with ❤️ by the HallucinationGuard team
+- Thanks to all our contributors and users
