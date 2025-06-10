@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
-	"os"
 
 	"github.com/fishonamos/HGuard/internal/core/model"
 	"github.com/fishonamos/HGuard/pkg/hallucinationguard"
