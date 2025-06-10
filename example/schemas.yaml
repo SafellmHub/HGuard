@@ -1,0 +1,48 @@
+schemas:
+  - name: weather
+    parameters:
+      location:
+        type: string
+        required: true
+      unit:
+        type: string
+        required: false
+        enum: ["C", "F"]
+  - name: money_transfer
+    parameters:
+      from_account:
+        type: string
+        required: true
+      to_account:
+        type: string
+        required: true
+      amount:
+        type: number
+        required: true
+  - name: stock_price
+    parameters:
+      symbol:
+        type: string
+        required: true
+      date:
+        type: string
+        required: false
+  - name: flight_booking
+    parameters:
+      origin:
+        type: string
+        required: true
+      destination:
+        type: string
+        required: true
+      date:
+        type: string
+        required: true
+      passengers:
+        type: number
+        required: true
+  - name: math_calculation
+    parameters:
+      expression:
+        type: string
+        required: true

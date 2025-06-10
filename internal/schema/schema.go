@@ -2,6 +2,12 @@ package schema
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/fishonamos/hallucination-shield/internal/core/fuzzy"
+	"github.com/fishonamos/hallucination-shield/internal/core/model"
+	"github.com/fishonamos/hallucination-shield/internal/core/policy"
+	"gopkg.in/yaml.v3"
 )
 
 // ParameterSchema defines the expected type and requirements for a parameter
@@ -75,4 +81,107 @@ func ValidateParameters(schema ToolSchema, params map[string]interface{}) error 
 		}
 	}
 	return nil
+}
+
+// LoadSchemasFromYAML loads tool schemas from a YAML file and registers them
+func LoadSchemasFromYAML(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	var data struct {
+		Schemas []ToolSchema `yaml:"schemas"`
+	}
+	if err := yaml.NewDecoder(f).Decode(&data); err != nil {
+		return err
+	}
+	for _, s := range data.Schemas {
+		RegisterToolSchema(s)
+	}
+	return nil
+}
+
+// ValidateAndPolicy validates a tool call and applies the policy, returning a ValidationResult
+func ValidateAndPolicy(tc model.ToolCall) model.ValidationResult {
+	result := model.ValidationResult{
+		ToolCallID:       tc.ID,
+		Status:           "approved",
+		Confidence:       1.0,
+		ExecutionAllowed: true,
+		PolicyAction:     string(policy.PolicyAllow),
+	}
+
+	schema, ok := GetToolSchema(tc.Name)
+	if !ok {
+		// Check for REWRITE policy for this tool name
+		ptype := policy.ApplyPolicy(tc)
+		if ptype == policy.PolicyRewrite {
+			// Fuzzy match to suggest correction
+			known := make([]string, 0, len(toolSchemas))
+			for k := range toolSchemas {
+				known = append(known, k)
+			}
+			if suggestion, _ := fuzzy.FuzzyMatchToolName(tc.Name, known, 2); suggestion != "" {
+				result.Status = "rewritten"
+				result.Confidence = 1.0
+				result.ExecutionAllowed = true
+				result.PolicyAction = string(policy.PolicyRewrite)
+				result.SuggestedCorrection = &model.ToolCall{
+					ID:         tc.ID,
+					Name:       suggestion,
+					Parameters: tc.Parameters,
+					Context:    tc.Context,
+					Timestamp:  tc.Timestamp,
+				}
+				result.Reason = "Did you mean '" + suggestion + "'?"
+				return result
+			}
+			result.Status = "rejected"
+			result.Confidence = 0.0
+			result.ExecutionAllowed = false
+			result.Reason = "Unknown tool name and no close match found"
+			result.PolicyAction = string(policy.PolicyReject)
+			return result
+		}
+		result.Status = "rejected"
+		result.Confidence = 0.0
+		result.ExecutionAllowed = false
+		result.Reason = "Unknown tool name"
+		result.PolicyAction = string(policy.PolicyReject)
+		return result
+	}
+
+	err := ValidateParameters(schema, tc.Parameters)
+	if err != nil {
+		result.Status = "rejected"
+		result.Confidence = 0.0
+		result.ExecutionAllowed = false
+		result.Reason = err.Error()
+		result.PolicyAction = string(policy.PolicyReject)
+		return result
+	}
+
+	ptype := policy.ApplyPolicy(tc)
+	result.PolicyAction = string(ptype)
+	if ptype == policy.PolicyReject {
+		result.Status = "rejected"
+		result.Confidence = 1.0
+		result.ExecutionAllowed = false
+		result.Reason = "Policy rejected tool call"
+	} else if ptype == policy.PolicyAllow {
+		result.Status = "approved"
+		result.Confidence = 1.0
+		result.ExecutionAllowed = true
+	} else if ptype == policy.PolicyLog {
+		result.Status = "approved"
+		result.Confidence = 1.0
+		result.ExecutionAllowed = true
+	} else if ptype == policy.PolicyRewrite {
+		result.Status = "rewritten"
+		result.Confidence = 1.0
+		result.ExecutionAllowed = true
+		// Optionally, set result.Modifications or result.SuggestedCorrection
+	}
+	return result
 }

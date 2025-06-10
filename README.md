@@ -204,6 +204,54 @@ HallucinationGuard supports config-based policy management. You can define tool 
 
 > **Note:** For now, the server must be restarted after editing the policy file. (Hot-reload can be added in the future.)
 
+## Using HallucinationGuard as a Go SDK
+
+You can embed HallucinationGuard in your Go project to validate tool calls using config-driven schemas and policies.
+
+### 1. Install
+
+```
+go get github.com/fishonamos/hallucination-shield/pkg/hallucinationguard
+```
+
+### 2. Example Usage
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/fishonamos/hallucination-shield/pkg/hallucinationguard"
+    "github.com/fishonamos/hallucination-shield/internal/core/model"
+    "time"
+)
+
+func main() {
+    guard := hallucinationguard.New()
+    err := guard.LoadSchemasFromFile("schemas.yaml")
+    if err != nil {
+        panic(err)
+    }
+    err = guard.LoadPoliciesFromFile("policies.yaml")
+    if err != nil {
+        panic(err)
+    }
+    toolCall := model.ToolCall{
+        ID: "1",
+        Name: "weather",
+        Parameters: map[string]interface{}{"location": "London"},
+        Context: model.CallContext{UserID: "user1"},
+        Timestamp: time.Now(),
+    }
+    result := guard.ValidateToolCall(toolCall)
+    fmt.Printf("Validation result: %+v\n", result)
+}
+```
+
+### 3. Configuration Files
+
+See `schemas.yaml` and `policies.yaml` for examples.
+
 ## License
 
 See [LICENSE](LICENSE).

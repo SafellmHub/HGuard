@@ -1,0 +1,13 @@
+policies:
+  - tool_name: weather
+    type: ALLOW
+  - tool_name: money_transfer
+    type: REJECT
+  - tool_name: stock_price
+    type: ALLOW
+  - tool_name: flight_booking
+    type: REJECT
+  - tool_name: math_calculation
+    type: ALLOW
+  - tool_name: wether
+    type: REWRITE
