@@ -1,131 +1,42 @@
 schemas:
+  - name: search
+    parameters:
+      query:
+        type: string
+        required: true
   - name: weather
-    description: Get current weather for a location
     parameters:
-      location:
+      city:
         type: string
         required: true
-        pattern: "^[a-zA-Z\\s,]+$" # Only letters, spaces, and commas
-        minLength: 2
-        maxLength: 100
-      unit:
+      country:
         type: string
         required: false
-        enum: ["C", "F"]
-        default: "C"
-      format: # New parameter for output format
-        type: string
-        required: false
-        enum: ["text", "json"]
-        default: "text"
-
-  - name: money_transfer
+  - name: quote
     parameters:
-      from_account:
-        type: string
-        required: true
-      to_account:
-        type: string
-        required: true
       amount:
         type: number
         required: true
-
-  - name: stock_price
-    description: Get stock price for a symbol
-    parameters:
-      symbol:
+      sourceCurrency:
         type: string
         required: true
-        pattern: "^[A-Z]{1,5}$" # 1-5 uppercase letters
-      date:
+      targetCurrency:
         type: string
+        required: true
+      paymentMethod:
+        type: string
+        required: true
+      paymentCurrency:
+        type: string
+        required: true
+      autopayout:
+        type: boolean
         required: false
-        format: "date" # YYYY-MM-DD
-        description: Historical date (defaults to current date)
-
-  - name: flight_booking
-    parameters:
-      origin:
-        type: string
-        required: true
-      destination:
-        type: string
-        required: true
-      date:
-        type: string
-        required: true
-      passengers:
-        type: number
-        required: true
-
-  - name: math_calculation
-    description: Perform mathematical calculations
-    parameters:
-      expression:
-        type: string
-        required: true
-        pattern: "^[0-9\\s\\+\\-\\*\\/\\(\\)\\.]+$" # Only numbers and basic operators
-      precision:
-        type: number
+      beneficiary:
+        type: object
         required: false
-        minimum: 0
-        maximum: 10
-        default: 2
-
-  - name: time_travel # Added for testing non-existent tool
-    description: This tool doesn't actually exist
+  - name: price
     parameters:
-      destination:
-        type: string
-        required: true
-        format: "date-time"
-      mode:
-        type: string
-        required: false
-        enum: ["past", "future"]
-
-  - name: weather_forecast # Added for testing typos
-    description: Get weather forecast (alternative spelling)
-    parameters:
-      location:
-        type: string
-        required: true
-        pattern: "^[a-zA-Z\\s,]+$"
-      days:
-        type: number
-        required: false
-        minimum: 1
-        maximum: 7
-        default: 3
-      unit:
-        type: string
-        required: false
-        enum: ["C", "F"]
-        default: "C"
-
-  - name: transfer_money
-    description: Transfer money between accounts
-    parameters:
-      from_account:
-        type: string
-        required: true
-        pattern: "^[A-Z0-9]{10}$" # 10 alphanumeric chars
-      to_account:
-        type: string
-        required: true
-        pattern: "^[A-Z0-9]{10}$"
-      amount:
-        type: number
-        required: true
-        minimum: 0.01
-        maximum: 1000000
       currency:
         type: string
-        required: false
-        enum: ["USD", "EUR", "GBP"]
-        default: "USD"
-      description:
-        type: string
-        required: false
-        maxLength: 100
+        required: true

@@ -1,65 +1,9 @@
 policies:
-  # Standard tools
   - tool_name: weather
     type: ALLOW
-    description: Allow weather queries with validation
-
-  - tool_name: stock_price
+  - tool_name: price
     type: ALLOW
-    description: Allow stock price queries with validation
-
-  - tool_name: math_calculation
-    type: ALLOW
-    description: Allow basic math calculations
-
-  # Restricted tools
-  - tool_name: transfer_money
+  - tool_name: quote
     type: REJECT
-    description: Never allow money transfers
-    reason: "Money transfers are not allowed for security reasons"
-
-  - tool_name: flight_booking
+  - tool_name: "*"
     type: REJECT
-    description: Never allow flight bookings
-    reason: "Flight bookings are not supported"
-
-  # Non-existent tool (for testing)
-  - tool_name: time_travel
-    type: REJECT
-    description: Reject time travel requests
-    reason: "Time travel is not possible"
-
-  # Typo corrections
-  - tool_name: wether
-    type: REWRITE
-    target: weather
-    description: Correct common typo 'wether' to 'weather'
-
-  - tool_name: wether_forcast
-    type: REWRITE
-    target: weather_forecast
-    description: Correct common typo 'wether_forcast' to 'weather_forecast'
-
-  - tool_name: stock
-    type: REWRITE
-    target: stock_price
-    description: Correct shorthand 'stock' to 'stock_price'
-
-  - tool_name: weather@2.0
-    type: REJECT
-    description: Reject invalid tool names with special characters
-    reason: "Invalid tool name format"
-
-  # Rate limiting
-  - tool_name: weather
-    type: RATE_LIMIT
-    max_calls: 10
-    window: 60 # seconds
-    description: Limit weather queries to 10 per minute
-
-  # Context-based policies
-  - tool_name: transfer_money
-    type: CONTEXT_REJECT
-    condition: "previous_calls contains 'transfer_money'"
-    description: Reject if there were previous transfer attempts
-    reason: "Multiple transfer attempts detected"
