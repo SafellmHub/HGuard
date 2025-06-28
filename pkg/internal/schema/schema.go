@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fishonamos/HGuard/pkg/internal/core/fuzzy"
-	"github.com/fishonamos/HGuard/pkg/internal/core/model"
-	"github.com/fishonamos/HGuard/pkg/internal/core/policy"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/fuzzy"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/model"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/policy"
 	"gopkg.in/yaml.v3"
 )
 

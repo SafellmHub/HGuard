@@ -1,7 +1,7 @@
 # HallucinationGuard
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/fishonamos/HGuard)](https://goreportcard.com/report/github.com/fishonamos/HGuard)
-[![GoDoc](https://godoc.org/github.com/fishonamos/HGuard?status.svg)](https://godoc.org/github.com/fishonamos/HGuard)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SafellmHub/HGuard)](https://goreportcard.com/report/github.com/SafellmHub/HGuard)
+[![GoDoc](https://godoc.org/github.com/SafellmHub/HGuard?status.svg)](https://godoc.org/github.com/SafellmHub/HGuard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM tool calls. It provides schema validation, policy enforcement, and extensibility for production-grade AI integrations.
@@ -17,7 +17,7 @@ HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM to
 ## Installation
 
 ```sh
-go get github.com/fishonamos/HGuard
+go get github.com/SafellmHub/HGuard
 ```
 
 ## Usage Example
@@ -28,7 +28,7 @@ Add HallucinationGuard to your agent in just a few lines:
 import (
     "context"
     "log"
-    "github.com/fishonamos/HGuard/pkg/hallucinationguard"
+    "github.com/SafellmHub/HGuard/pkg/hallucinationguard"
 )
 
 type HGuardAgent struct {
@@ -51,13 +51,12 @@ func (a *HGuardAgent) ValidateToolCall(ctx context.Context, toolCall hallucinati
     return a.guard.ValidateToolCall(ctx, toolCall)
 }
 
-
 // Usage in your agent:
 func main() {
     ctx := context.Background()
     agent := NewHGuardAgent("schemas.yaml", "policies.yaml")
 
-    Tool call (from LLM or user)
+    // Tool call (from LLM or user)
     toolCall := hallucinationguard.ToolCall{
         Name: "weather",
         Parameters: map[string]interface{}{"city": "London"},
@@ -113,5 +112,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Community
 
 - [Discord](https://discord.gg/hallucinationguard) - Join our community
-- [GitHub Issues](https://github.com/fishonamos/HGuard/issues) - Report bugs or request features
+- [GitHub Issues](https://github.com/SafellmHub/HGuard/issues) - Report bugs or request features
 - [Contributing Guide]- Help improve HallucinationGuard. Create and issue and raise a PR!

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/fishonamos/HGuard/pkg/internal/core/model"
-	"github.com/fishonamos/HGuard/pkg/internal/core/policy"
-	"github.com/fishonamos/HGuard/pkg/internal/schema"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/model"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/policy"
+	"github.com/SafellmHub/HGuard/pkg/internal/schema"
 )
 
 // ToolCall represents a tool call request

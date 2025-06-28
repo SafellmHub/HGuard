@@ -3,7 +3,7 @@ package policy
 import (
 	"os"
 
-	"github.com/fishonamos/HGuard/pkg/internal/core/model"
+	"github.com/SafellmHub/HGuard/pkg/internal/core/model"
 	"gopkg.in/yaml.v3"
 )
 

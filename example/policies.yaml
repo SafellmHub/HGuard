@@ -4,6 +4,6 @@ policies:
   - tool_name: price
     type: ALLOW
   - tool_name: quote
-    type: REJECT
+    type: ALLOW
   - tool_name: "*"
     type: REJECT
