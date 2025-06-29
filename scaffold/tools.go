@@ -27,7 +27,7 @@ func WeatherTool(ctx context.Context, params map[string]interface{}) (string, er
 		city, _ = params["location"].(string)
 	}
 	country, _ := params["country"].(string)
-	apiKey := getenvOrDefault("OPENWEATHER_API_KEY", "62af9df095ebb93b2db02472fc24ae68")
+	apiKey := getenvOrDefault("OPENWEATHER_API_KEY", "")
 	weather, err := getWeather(ctx, city, country, apiKey)
 	if err != nil {
 		return "", err
