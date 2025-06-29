@@ -12,7 +12,6 @@ HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM to
 - Policy-based allow/reject/rewrite
 - Extensible schema and policy loading
 - Thread-safe and context-aware
-- Meaningful error messages for production
 
 ## Installation
 
@@ -50,8 +49,10 @@ func NewHGuardAgent(schemaPath, policyPath string) *HGuardAgent {
 func (a *HGuardAgent) ValidateToolCall(ctx context.Context, toolCall hallucinationguard.ToolCall) hallucinationguard.ValidationResult {
     return a.guard.ValidateToolCall(ctx, toolCall)
 }
+```
 
-// Usage in your agent:
+## How to use in your agent:
+```
 func main() {
     ctx := context.Background()
     agent := NewHGuardAgent("schemas.yaml", "policies.yaml")
@@ -73,6 +74,8 @@ func main() {
     // you can now proceed to execute the tool call
 }
 ```
+
+Check the examples folder for more details.
 
 ## Configuration
 
