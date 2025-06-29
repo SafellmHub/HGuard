@@ -6,6 +6,16 @@
 
 HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM tool calls. It provides schema validation, policy enforcement, and extensibility for production-grade AI integrations.
 
+![status: experimental](https://img.shields.io/badge/status-experimental-orange)
+
+⚠️ Experimental Notice
+
+This package is currently experimental and still under active development.
+
+We welcome your feedback and encourage you to report issues or suggest improvements.
+
+
+
 ## Features
 
 - Structured validation of tool calls
