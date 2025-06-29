@@ -1,4 +1,4 @@
-module github.com/SafellmHub/HGuard
+module github.com/SafellmHub/hguard-go
 
 go 1.21
 

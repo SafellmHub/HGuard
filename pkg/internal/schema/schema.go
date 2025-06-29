@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SafellmHub/HGuard/pkg/internal/core/fuzzy"
-	"github.com/SafellmHub/HGuard/pkg/internal/core/model"
-	"github.com/SafellmHub/HGuard/pkg/internal/core/policy"
+	"github.com/SafellmHub/hguard-go/pkg/internal/core/fuzzy"
+	"github.com/SafellmHub/hguard-go/pkg/internal/core/model"
+	"github.com/SafellmHub/hguard-go/pkg/internal/core/policy"
 	"gopkg.in/yaml.v3"
 )
 

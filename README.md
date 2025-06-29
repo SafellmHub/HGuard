@@ -1,7 +1,7 @@
 # HallucinationGuard
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/SafellmHub/HGuard)](https://goreportcard.com/report/github.com/SafellmHub/HGuard)
-[![GoDoc](https://godoc.org/github.com/SafellmHub/HGuard?status.svg)](https://godoc.org/github.com/SafellmHub/HGuard)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SafellmHub/hguard-go)](https://goreportcard.com/report/github.com/SafellmHub/hguard-go)
+[![GoDoc](https://godoc.org/github.com/SafellmHub/hguard-go?status.svg)](https://godoc.org/github.com/SafellmHub/hguard-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM tool calls. It provides schema validation, policy enforcement, and extensibility for production-grade AI integrations.
@@ -16,7 +16,7 @@ HallucinationGuard is a Go SDK for validating and enforcing guardrails on LLM to
 ## Installation
 
 ```sh
-go get github.com/SafellmHub/HGuard
+go get github.com/SafellmHub/hguard-go
 ```
 
 ## Usage Example
@@ -27,7 +27,7 @@ Add HallucinationGuard to your agent in just a few lines:
 import (
     "context"
     "log"
-    "github.com/SafellmHub/HGuard/pkg/hallucinationguard"
+    "github.com/SafellmHub/hguard-go/pkg/hallucinationguard"
 )
 
 type HGuardAgent struct {
@@ -115,5 +115,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Community
 
 - [Discord](https://discord.gg/hallucinationguard) - Join our community
-- [GitHub Issues](https://github.com/SafellmHub/HGuard/issues) - Report bugs or request features
+- [GitHub Issues](https://github.com/SafellmHub/hguard-go/issues) - Report bugs or request features
 - [Contributing Guide]- Help improve HallucinationGuard. Create and issue and raise a PR!

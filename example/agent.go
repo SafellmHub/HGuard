@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/SafellmHub/HGuard/pkg/hallucinationguard"
+	"github.com/SafellmHub/hguard-go/pkg/hallucinationguard"
 )
 
 const (
