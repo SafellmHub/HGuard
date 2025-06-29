@@ -1,17 +1,28 @@
 schemas:
+  - name: weather
+    parameters:
+      city:
+        type: string
+        required: false
+      location:
+        type: string
+        required: false
+    required_one_of:
+      - city
+      - location
+  - name: addition
+    parameters:
+      a:
+        type: number
+        required: true
+      b:
+        type: number
+        required: true
   - name: search
     parameters:
       query:
         type: string
         required: true
-  - name: weather
-    parameters:
-      city:
-        type: string
-        required: true
-      country:
-        type: string
-        required: false
   - name: quote
     parameters:
       amount:

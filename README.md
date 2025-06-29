@@ -51,32 +51,6 @@ func (a *HGuardAgent) ValidateToolCall(ctx context.Context, toolCall hallucinati
 }
 ```
 
-## How to use in your agent:
-```
-func main() {
-    ctx := context.Background()
-    agent := NewHGuardAgent("schemas.yaml", "policies.yaml")
-
-    // Tool call (from LLM or user)
-    toolCall := hallucinationguard.ToolCall{
-        Name: "weather",
-        Parameters: map[string]interface{}{"city": "London"},
-    }
-
-    result := agent.ValidateToolCall(ctx, toolCall)
-    if !result.ExecutionAllowed {
-        log.Printf("Tool call rejected: %s (action: %s)", result.Error, result.PolicyAction)
-        if result.SuggestedCorrection != nil {
-            log.Printf("Did you mean: %v?", result.SuggestedCorrection)
-        }
-        return
-    }
-    // you can now proceed to execute the tool call
-}
-```
-
-Check the examples folder for more details.
-
 ## Configuration
 
 You can customize the Guard with functional options:
@@ -108,6 +82,11 @@ The Guard is safe for concurrent use.
 
 You can provide your own schema loader or policy engine by implementing the respective interfaces and passing them as options.
 
+## More
+
+- **Agent Scaffold:** See the [`scaffold/`](./scaffold/README.md) directory for a full agent scaffold and usage examples.
+- **Web Demo:** See the [`webapp/`](./webapp/README.md) directory for a web demo and UI. Each has its own README for details.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -116,4 +95,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Discord](https://discord.gg/hallucinationguard) - Join our community
 - [GitHub Issues](https://github.com/SafellmHub/hguard-go/issues) - Report bugs or request features
-- [Contributing Guide]- Help improve HallucinationGuard. Create and issue and raise a PR!
+- [Contributing Guide] - Help improve HallucinationGuard. Create an issue and raise a PR!
