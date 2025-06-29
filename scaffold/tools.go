@@ -75,7 +75,7 @@ func SearchTool(ctx context.Context, params map[string]interface{}) (string, err
 }
 
 func QuoteTool(ctx context.Context, params map[string]interface{}) (string, error) {
-	apiKey := getenvOrDefault("MAVAPAY_API_KEY", "c8b5c1fd6f1c8bba7cbb2f7c7f2a4022197b739b343")
+	apiKey := getenvOrDefault("MAVAPAY_API_KEY", "")
 	bodyBytes, _ := json.Marshal(params)
 	req, err := http.NewRequestWithContext(ctx, "POST", "https://staging.api.mavapay.co/api/v1/quote", strings.NewReader(string(bodyBytes)))
 	if err != nil {
@@ -93,7 +93,7 @@ func QuoteTool(ctx context.Context, params map[string]interface{}) (string, erro
 }
 
 func PriceTool(ctx context.Context, params map[string]interface{}) (string, error) {
-	apiKey := getenvOrDefault("MAVAPAY_API_KEY", "c8b5c1fd6f1c8bba7cbb2f7c7f2a4022197b739b343")
+	apiKey := getenvOrDefault("MAVAPAY_API_KEY", "")
 	currency, _ := params["currency"].(string)
 	url := fmt.Sprintf("https://staging.api.mavapay.co/api/v1/price?currency=%s", currency)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
