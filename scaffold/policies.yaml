@@ -1,9 +1,13 @@
 policies:
   - tool_name: weather
     type: ALLOW
-  - tool_name: price
+  - tool_name: addition
+    type: ALLOW
+  - tool_name: search
     type: ALLOW
   - tool_name: quote
+    type: ALLOW
+  - tool_name: price
     type: ALLOW
   - tool_name: "*"
     type: REJECT
