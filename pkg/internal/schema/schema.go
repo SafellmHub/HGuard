@@ -10,7 +10,28 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ParameterSchema defines the expected type and requirements for a parameter
+// Package schema provides schema definitions, registration, and validation for LLM tool calls.
+//
+// Example YAML schema:
+//
+//	schemas:
+//	  - name: weather
+//	    parameters:
+//	      city:
+//	        type: string
+//	        required: true
+//	      unit:
+//	        type: string
+//	        required: false
+//	        enum: ["C", "F"]
+//
+// Example usage:
+//
+//	err := schema.LoadSchemasFromYAML("schemas.yaml")
+//	ts, ok := schema.GetToolSchema("weather")
+//	err = schema.ValidateParameters(ts, map[string]interface{}{ "city": "London" })
+//
+// ParameterSchema defines the expected type and requirements for a parameter.
 type ParameterSchema struct {
 	Type      string // e.g., "string", "number", "boolean"
 	Required  bool
@@ -19,7 +40,7 @@ type ParameterSchema struct {
 	MaxLength int      // for strings (optional)
 }
 
-// ToolSchema defines the schema for a tool
+// ToolSchema defines the schema for a tool.
 type ToolSchema struct {
 	Name       string
 	Parameters map[string]ParameterSchema
@@ -28,18 +49,30 @@ type ToolSchema struct {
 // In-memory registry of tool schemas
 var toolSchemas = map[string]ToolSchema{}
 
-// RegisterToolSchema adds a tool schema to the registry
+// RegisterToolSchema adds a tool schema to the registry.
+//
+// Example:
+//
+//	schema.RegisterToolSchema(ToolSchema{Name: "weather", Parameters: ...})
 func RegisterToolSchema(schema ToolSchema) {
 	toolSchemas[schema.Name] = schema
 }
 
-// GetToolSchema retrieves a tool schema by name
+// GetToolSchema retrieves a tool schema by name.
+//
+// Example:
+//
+//	ts, ok := schema.GetToolSchema("weather")
 func GetToolSchema(name string) (ToolSchema, bool) {
 	schema, ok := toolSchemas[name]
 	return schema, ok
 }
 
-// ToolSchemas returns a copy of all registered tool schemas
+// ToolSchemas returns a copy of all registered tool schemas.
+//
+// Example:
+//
+//	all := schema.ToolSchemas()
 func ToolSchemas() map[string]ToolSchema {
 	copy := make(map[string]ToolSchema, len(toolSchemas))
 	for k, v := range toolSchemas {
@@ -48,7 +81,11 @@ func ToolSchemas() map[string]ToolSchema {
 	return copy
 }
 
-// ValidateParameters checks if the parameters conform to the schema
+// ValidateParameters checks if the parameters conform to the schema.
+//
+// Example:
+//
+//	err := schema.ValidateParameters(ts, map[string]interface{}{ "city": "London" })
 func ValidateParameters(schema ToolSchema, params map[string]interface{}) error {
 	for paramName, paramSchema := range schema.Parameters {
 		value, exists := params[paramName]
@@ -83,7 +120,11 @@ func ValidateParameters(schema ToolSchema, params map[string]interface{}) error 
 	return nil
 }
 
-// LoadSchemasFromYAML loads tool schemas from a YAML file and registers them
+// LoadSchemasFromYAML loads tool schemas from a YAML file and registers them.
+//
+// Example:
+//
+//	err := schema.LoadSchemasFromYAML("schemas.yaml")
 func LoadSchemasFromYAML(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -102,7 +143,11 @@ func LoadSchemasFromYAML(path string) error {
 	return nil
 }
 
-// ValidateAndPolicy validates a tool call and applies the policy, returning a ValidationResult
+// ValidateAndPolicy validates a tool call and applies the policy, returning a ValidationResult.
+//
+// Example:
+//
+//	result := schema.ValidateAndPolicy(tc)
 func ValidateAndPolicy(tc model.ToolCall) model.ValidationResult {
 	result := model.ValidationResult{
 		ToolCallID:       tc.ID,
