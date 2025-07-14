@@ -10,15 +10,33 @@ import (
 	"github.com/SafellmHub/hguard-go/pkg/internal/schema"
 )
 
-// ToolCall represents a tool call request
-// ToolCall is the public struct for tool call validation requests.
+// Package hallucinationguard provides a guardrail system for validating and enforcing policies on LLM tool calls.
+//
+// Example usage:
+//
+//	guard := hallucinationguard.New()
+//	err := guard.LoadSchemasFromFile(ctx, "schemas.yaml")
+//	err = guard.LoadPoliciesFromFile(ctx, "policies.yaml")
+//	result := guard.ValidateToolCall(ctx, hallucinationguard.ToolCall{Name: "weather", Parameters: map[string]interface{}{...}})
+//	if result.ExecutionAllowed { /* execute tool */ }
+//
+// ToolCall represents a tool call request.
+// Use this struct to pass tool call data to the Guard for validation.
+//
+// Example:
+//
+//	tc := ToolCall{Name: "weather", Parameters: map[string]interface{}{ "city": "London" }}
 type ToolCall struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
 }
 
-// ValidationResult represents the result of validating a tool call
-// ValidationResult contains the outcome, error, policy action, and any suggested correction.
+// ValidationResult represents the result of validating a tool call.
+//
+// Example:
+//
+//	result := guard.ValidateToolCall(ctx, tc)
+//	if result.ExecutionAllowed { /* ... */ }
 type ValidationResult struct {
 	ExecutionAllowed    bool      `json:"allowed"`
 	Error               string    `json:"error,omitempty"`
@@ -38,45 +56,67 @@ const (
 	PolicyActionCONTEXT_REJECT = "CONTEXT_REJECT"
 )
 
-// SchemaLoader defines the interface for loading schemas
-// This allows for custom schema loading implementations.
+// SchemaLoader defines the interface for loading schemas.
+// Implement this interface to provide custom schema loading logic.
 type SchemaLoader interface {
 	LoadSchemas(ctx context.Context, path string) error
 }
 
-// PolicyEngine defines the interface for loading and applying policies
-// This allows for custom policy engine implementations.
+// PolicyEngine defines the interface for loading and applying policies.
+// Implement this interface to provide custom policy engine logic.
 type PolicyEngine interface {
 	LoadPolicies(ctx context.Context, path string) error
 }
 
-// Guard is the main SDK struct for embedding HallucinationGuard
-// in other Go projects. It is safe for concurrent use.
+// Guard is the main SDK struct for embedding HallucinationGuard in other Go projects.
+// It is safe for concurrent use.
+//
+// Example usage:
+//
+//	guard := hallucinationguard.New()
+//	err := guard.LoadSchemasFromFile(ctx, "schemas.yaml")
+//	err = guard.LoadPoliciesFromFile(ctx, "policies.yaml")
 type Guard struct {
 	mu           sync.RWMutex
 	schemaLoader SchemaLoader
 	policyEngine PolicyEngine
 }
 
-// GuardOption is a functional option for configuring Guard
-// Example: WithSchemaLoader(customLoader)
+// GuardOption is a functional option for configuring Guard.
+//
+// Example:
+//
+//	guard := hallucinationguard.New(hallucinationguard.WithSchemaLoader(myLoader))
 type GuardOption func(*Guard)
 
-// WithSchemaLoader sets a custom SchemaLoader
+// WithSchemaLoader sets a custom SchemaLoader for the Guard.
+//
+// Example:
+//
+//	guard := hallucinationguard.New(WithSchemaLoader(myLoader))
 func WithSchemaLoader(loader SchemaLoader) GuardOption {
 	return func(g *Guard) {
 		g.schemaLoader = loader
 	}
 }
 
-// WithPolicyEngine sets a custom PolicyEngine
+// WithPolicyEngine sets a custom PolicyEngine for the Guard.
+//
+// Example:
+//
+//	guard := hallucinationguard.New(WithPolicyEngine(myEngine))
 func WithPolicyEngine(engine PolicyEngine) GuardOption {
 	return func(g *Guard) {
 		g.policyEngine = engine
 	}
 }
 
-// New creates a new Guard instance with optional configuration
+// New creates a new Guard instance with optional configuration.
+//
+// Example:
+//
+//	guard := New()
+//	guard := New(WithSchemaLoader(myLoader), WithPolicyEngine(myEngine))
 func New(opts ...GuardOption) *Guard {
 	g := &Guard{
 		schemaLoader: defaultSchemaLoader{},
@@ -88,7 +128,11 @@ func New(opts ...GuardOption) *Guard {
 	return g
 }
 
-// LoadSchemasFromFile loads tool schemas from a YAML file using the configured loader
+// LoadSchemasFromFile loads tool schemas from a YAML file using the configured loader.
+//
+// Example:
+//
+//	err := guard.LoadSchemasFromFile(ctx, "schemas.yaml")
 func (g *Guard) LoadSchemasFromFile(ctx context.Context, path string) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -98,7 +142,11 @@ func (g *Guard) LoadSchemasFromFile(ctx context.Context, path string) error {
 	return nil
 }
 
-// LoadPoliciesFromFile loads policies from a YAML file using the configured engine
+// LoadPoliciesFromFile loads policies from a YAML file using the configured engine.
+//
+// Example:
+//
+//	err := guard.LoadPoliciesFromFile(ctx, "policies.yaml")
 func (g *Guard) LoadPoliciesFromFile(ctx context.Context, path string) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -108,7 +156,11 @@ func (g *Guard) LoadPoliciesFromFile(ctx context.Context, path string) error {
 	return nil
 }
 
-// ValidateToolCall validates a tool call using loaded schemas and policies
+// ValidateToolCall validates a tool call using loaded schemas and policies.
+//
+// Example:
+//
+//	result := guard.ValidateToolCall(ctx, ToolCall{Name: "weather", Parameters: map[string]interface{}{ "city": "London" }})
 func (g *Guard) ValidateToolCall(ctx context.Context, tc ToolCall) ValidationResult {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
@@ -137,15 +189,16 @@ func (g *Guard) ValidateToolCall(ctx context.Context, tc ToolCall) ValidationRes
 	return validationResult
 }
 
-// defaultSchemaLoader is the default implementation using the internal schema package
-// Implements SchemaLoader
-// ...
+// defaultSchemaLoader is the default implementation using the internal schema package.
+// Implements SchemaLoader.
 type defaultSchemaLoader struct{}
 
 func (d defaultSchemaLoader) LoadSchemas(ctx context.Context, path string) error {
 	return schema.LoadSchemasFromYAML(path)
 }
 
+// defaultPolicyEngine is the default implementation using the internal policy package.
+// Implements PolicyEngine.
 type defaultPolicyEngine struct{}
 
 func (d defaultPolicyEngine) LoadPolicies(ctx context.Context, path string) error {
