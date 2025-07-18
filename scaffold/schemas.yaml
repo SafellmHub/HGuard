@@ -1,4 +1,5 @@
 schemas:
+  # Basic tools
   - name: weather
     parameters:
       city:
@@ -7,9 +8,13 @@ schemas:
       location:
         type: string
         required: false
+      country:
+        type: string
+        required: false
     required_one_of:
       - city
       - location
+
   - name: addition
     parameters:
       a:
@@ -18,11 +23,13 @@ schemas:
       b:
         type: number
         required: true
+
   - name: search
     parameters:
       query:
         type: string
         required: true
+
   - name: quote
     parameters:
       amount:
@@ -46,8 +53,181 @@ schemas:
       beneficiary:
         type: object
         required: false
+
   - name: price
     parameters:
       currency:
         type: string
         required: true
+
+  # Business tools
+  - name: file_operations
+    parameters:
+      operation:
+        type: string
+        required: true
+        enum: ["list", "read", "write", "delete"]
+      filepath:
+        type: string
+        required: true
+      content:
+        type: string
+        required: false
+
+  - name: system_info
+    parameters:
+      info_type:
+        type: string
+        required: false
+        enum: ["cpu", "memory", "disk", "network", "general"]
+
+  - name: user_management
+    parameters:
+      action:
+        type: string
+        required: true
+        enum: ["create", "delete", "list", "update"]
+      username:
+        type: string
+        required: false
+      role:
+        type: string
+        required: false
+        enum: ["admin", "manager", "developer", "user", "guest"]
+      new_role:
+        type: string
+        required: false
+        enum: ["admin", "manager", "developer", "user", "guest"]
+
+  - name: send_email
+    parameters:
+      to:
+        type: string
+        required: true
+      subject:
+        type: string
+        required: true
+      body:
+        type: string
+        required: true
+      cc:
+        type: string
+        required: false
+      bcc:
+        type: string
+        required: false
+
+  - name: database_query
+    parameters:
+      query:
+        type: string
+        required: true
+      database:
+        type: string
+        required: true
+      limit:
+        type: number
+        required: false
+
+  - name: calendar
+    parameters:
+      action:
+        type: string
+        required: true
+        enum: ["create", "list", "update", "delete"]
+      title:
+        type: string
+        required: false
+      date:
+        type: string
+        required: false
+      event_id:
+        type: string
+        required: false
+      time:
+        type: string
+        required: false
+      duration:
+        type: number
+        required: false
+      participants:
+        type: array
+        required: false
+
+  - name: task_management
+    parameters:
+      action:
+        type: string
+        required: true
+        enum: ["create", "list", "update", "delete"]
+      title:
+        type: string
+        required: false
+      priority:
+        type: string
+        required: false
+        enum: ["low", "medium", "high", "urgent"]
+      task_id:
+        type: string
+        required: false
+      status:
+        type: string
+        required: false
+        enum: ["pending", "in_progress", "completed", "cancelled"]
+      assigned_to:
+        type: string
+        required: false
+      due_date:
+        type: string
+        required: false
+
+  - name: analytics
+    parameters:
+      report_type:
+        type: string
+        required: true
+        enum: ["sales", "users", "performance", "general"]
+      date_range:
+        type: string
+        required: false
+        enum: ["today", "week", "month", "quarter", "year"]
+      filters:
+        type: object
+        required: false
+
+  - name: document_gen
+    parameters:
+      document_type:
+        type: string
+        required: true
+        enum: ["report", "invoice", "contract", "letter", "presentation"]
+      template:
+        type: string
+        required: true
+      data:
+        type: object
+        required: false
+      format:
+        type: string
+        required: false
+        enum: ["pdf", "docx", "html", "txt"]
+
+  - name: notification
+    parameters:
+      type:
+        type: string
+        required: true
+        enum: ["email", "sms", "push", "slack", "webhook"]
+      message:
+        type: string
+        required: true
+      recipients:
+        type: array
+        required: true
+      priority:
+        type: string
+        required: false
+        enum: ["low", "normal", "high", "urgent"]
+      schedule:
+        type: string
+        required: false

@@ -14,14 +14,15 @@ This package is currently experimental and still under active development.
 
 We welcome your feedback and encourage you to report issues or suggest improvements.
 
-
-
 ## Features
 
-- Structured validation of tool calls
-- Policy-based allow/reject/rewrite
-- Extensible schema and policy loading
-- Thread-safe and context-aware
+- **Schema Validation**: Structured validation of tool calls against JSON schemas
+- **Context-Aware Policies**: Role-based, time-based, and session-based policy enforcement
+- **Conditional Logic**: Complex conditional expressions for advanced policy rules
+- **Policy Priority**: Hierarchical policy system with priority-based rule resolution
+- **Auto-Correction**: Automatic tool name correction for common typos
+- **Thread-Safe**: Safe for concurrent use in production environments
+- **Extensible**: Custom schema loaders and policy engines
 
 ## Installation
 
@@ -31,7 +32,7 @@ go get github.com/SafellmHub/hguard-go
 
 ## Usage Example
 
-Add HallucinationGuard to your agent in just a few lines:
+Add HallucinationGuard to your agent with context-aware policies:
 
 ```go
 import (
@@ -61,6 +62,65 @@ func (a *HGuardAgent) ValidateToolCall(ctx context.Context, toolCall hallucinati
 }
 ```
 
+## Context-Aware Policies
+
+HallucinationGuard supports rich context-aware policies:
+
+```yaml
+policies:
+  # Role-based access control
+  - tool_name: admin_tool
+    type: REJECT
+    condition: "user.role != 'admin'"
+    reason: "Only administrators can use this tool"
+    priority: 10
+
+  # Parameter-based restrictions
+  - tool_name: transfer_money
+    type: ALLOW
+    condition: "user.role == 'admin' && params.amount < 1000"
+    reason: "Small transfers allowed for admins"
+    priority: 15
+
+  # Time-based restrictions
+  - tool_name: maintenance_tool
+    type: REJECT
+    condition: "time.hour < 9 || time.hour > 17"
+    reason: "Maintenance tools only available during business hours"
+    priority: 5
+
+  # Session-based restrictions
+  - tool_name: sensitive_operation
+    type: REJECT
+    condition: "'sensitive_operation' in session.previous_calls"
+    reason: "Operation already performed in this session"
+    priority: 8
+```
+
+## Usage with Context
+
+```go
+toolCall := hallucinationguard.ToolCall{
+    Name: "transfer_money",
+    Parameters: map[string]interface{}{
+        "amount": 500,
+    },
+    Context: &hallucinationguard.CallContext{
+        UserRole: "admin",
+        UserID:   "user123",
+        SessionID: "session456",
+        PreviousCalls: []string{"get_balance"},
+        UserPermissions: []string{"financial_access"},
+        TimeOfDay: 14, // 2 PM
+        Metadata: map[string]interface{}{
+            "subscription_tier": "premium",
+        },
+    },
+}
+
+result := guard.ValidateToolCall(ctx, toolCall)
+```
+
 ## Configuration
 
 You can customize the Guard with functional options:
@@ -83,6 +143,16 @@ The `ValidationResult` struct provides detailed information:
 - `ToolCallID` (string): ID of the validated tool call.
 - `Status` (string): Status of the validation (approved, rejected, rewritten).
 - `Confidence` (float64): Confidence score for the validation decision.
+
+## Policy Types
+
+HallucinationGuard supports multiple policy types:
+
+- **ALLOW**: Allow the tool call
+- **REJECT**: Reject the tool call
+- **REWRITE**: Auto-correct tool name to target
+- **LOG**: Allow but log the call
+- **CONTEXT_REJECT**: Reject based on context conditions
 
 ## Thread Safety
 

@@ -13,11 +13,15 @@ type ToolCall struct {
 
 // CallContext represents the context of a tool call
 type CallContext struct {
-	UserID          string   `json:"user_id"`
-	SessionID       string   `json:"session_id"`
-	ConversationID  string   `json:"conversation_id"`
-	PreviousCalls   []string `json:"previous_calls"`
-	UserPermissions []string `json:"user_permissions"`
+	UserID          string                 `json:"user_id"`
+	UserRole        string                 `json:"user_role"`
+	SessionID       string                 `json:"session_id"`
+	ConversationID  string                 `json:"conversation_id"`
+	PreviousCalls   []string               `json:"previous_calls"`
+	UserPermissions []string               `json:"user_permissions"`
+	IPAddress       string                 `json:"ip_address"`
+	TimeOfDay       int                    `json:"time_of_day"` // Hour of day (0-23)
+	Metadata        map[string]interface{} `json:"metadata"`    // Arbitrary context data
 }
 
 // ValidationResult represents the result of validating a tool call

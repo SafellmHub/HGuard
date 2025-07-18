@@ -1,7 +1,91 @@
 policies:
+  # Simple allow policy
   - tool_name: get_weather
     type: ALLOW
+
+  # Simple reject policy with reason
   - tool_name: transfer_money
     type: REJECT
+    reason: "Money transfers are not allowed for security reasons"
+
+  # Role-based access control
+  - tool_name: admin_delete_user
+    type: REJECT
+    condition: "user.role != 'admin'"
+    reason: "Only administrators can delete users"
+    priority: 10
+
+  # Allow admins to access admin tools
+  - tool_name: admin_delete_user
+    type: ALLOW
+    condition: "user.role == 'admin'"
+    reason: "Admin access granted"
+    priority: 20
+
+  # Parameter-based restrictions
+  - tool_name: transfer_money
+    type: ALLOW
+    condition: "user.role == 'admin' && params.amount < 1000"
+    reason: "Small transfers allowed for admins"
+    priority: 15
+
+  # Session-based restrictions
+  - tool_name: sensitive_operation
+    type: REJECT
+    condition: "'sensitive_operation' in session.previous_calls"
+    reason: "Sensitive operation already performed in this session"
+    priority: 5
+
+  # Time-based restrictions
+  - tool_name: maintenance_tool
+    type: REJECT
+    condition: "time.hour < 9 || time.hour > 17"
+    reason: "Maintenance tools only available during business hours (9-17)"
+    priority: 5
+
+  # Permission-based access
+  - tool_name: financial_data
+    type: ALLOW
+    condition: "'read_financial' in user.permissions"
+    reason: "User has financial data access permission"
+    priority: 8
+
+  # IP-based restrictions (simplified)
+  - tool_name: internal_tool
+    type: REJECT
+    condition: "request.ip != '192.168.1.100'"
+    reason: "Internal tools only accessible from specific IP"
+    priority: 12
+
+  # Metadata-based conditions
+  - tool_name: special_feature
+    type: ALLOW
+    condition: "metadata.subscription_tier == 'premium'"
+    reason: "Premium feature access"
+    priority: 7
+
+  # Auto-correct common typos
   - tool_name: get_whether
     type: REWRITE
+    target: get_weather
+    reason: "Auto-corrected 'whether' to 'weather'"
+
+  # Complex condition with multiple factors
+  - tool_name: high_value_transaction
+    type: ALLOW
+    condition: "user.role == 'admin' && params.amount < 10000 && time.hour >= 9 && time.hour <= 17 && len(session.previous_calls) < 5"
+    reason: "High-value transaction approved under controlled conditions"
+    priority: 25
+
+  # Context-aware rate limiting simulation
+  - tool_name: api_call
+    type: REJECT
+    condition: "len(session.previous_calls) > 10"
+    reason: "Rate limit exceeded: too many API calls in this session"
+    priority: 3
+
+  # Fallback policy for unknown tools
+  - tool_name: "*"
+    type: REJECT
+    reason: "Unknown tool rejected by default policy"
+    priority: 1
