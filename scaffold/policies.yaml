@@ -1,13 +1,280 @@
 policies:
+  # Basic tools - generally allowed for all users
   - tool_name: weather
     type: ALLOW
+    reason: "Weather information is publicly available"
+
   - tool_name: addition
     type: ALLOW
+    reason: "Basic math operations are allowed for all users"
+
   - tool_name: search
     type: ALLOW
+    reason: "Web search is allowed for all users"
+
+  # Financial tools - restricted access
+  - tool_name: quote
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot access financial services"
+    priority: 20
+
+  - tool_name: quote
+    type: REJECT
+    condition: "params.amount > 10000 && user.role != 'admin'"
+    reason: "Large transactions require admin approval"
+    priority: 15
+
   - tool_name: quote
     type: ALLOW
+    condition: "'financial_access' in user.permissions"
+    reason: "User has financial access permission"
+    priority: 10
+
+  - tool_name: price
+    type: REJECT
+    condition: "time.hour < 9 || time.hour > 17"
+    reason: "Price queries only available during business hours (9-17)"
+    priority: 5
+
   - tool_name: price
     type: ALLOW
+    condition: "user.role != 'guest'"
+    reason: "Price information available to registered users"
+    priority: 3
+
+  # File operations - admin and developer only
+  - tool_name: file_operations
+    type: REJECT
+    condition: "user.role != 'admin' && user.role != 'developer'"
+    reason: "File operations require admin or developer privileges"
+    priority: 25
+
+  - tool_name: file_operations
+    type: REJECT
+    condition: "params.operation == 'delete' && user.role != 'admin'"
+    reason: "File deletion requires admin privileges"
+    priority: 30
+
+  - tool_name: file_operations
+    type: ALLOW
+    condition: "'file_operations' in user.permissions"
+    reason: "User has file operations permission"
+    priority: 20
+
+  # System information - restricted access
+  - tool_name: system_info
+    type: REJECT
+    condition: "user.role == 'guest' || user.role == 'user'"
+    reason: "System information requires elevated privileges"
+    priority: 15
+
+  - tool_name: system_info
+    type: ALLOW
+    condition: "'system_access' in user.permissions"
+    reason: "User has system access permission"
+    priority: 10
+
+  # User management - admin only
+  - tool_name: user_management
+    type: REJECT
+    condition: "user.role != 'admin'"
+    reason: "User management requires admin privileges"
+    priority: 30
+
+  - tool_name: user_management
+    type: ALLOW
+    condition: "user.role == 'admin' && 'user_management' in user.permissions"
+    reason: "Admin with user management permissions"
+    priority: 25
+
+  # Email sending - requires permission
+  - tool_name: send_email
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot send emails"
+    priority: 20
+
+  - tool_name: send_email
+    type: REJECT
+    condition: "len(session.previous_calls) > 10"
+    reason: "Email rate limit exceeded for this session"
+    priority: 15
+
+  - tool_name: send_email
+    type: ALLOW
+    condition: "'email_send' in user.permissions"
+    reason: "User has email sending permission"
+    priority: 10
+
+  # Database queries - requires permission
+  - tool_name: database_query
+    type: REJECT
+    condition: "user.role == 'guest' || user.role == 'user'"
+    reason: "Database access requires elevated privileges"
+    priority: 20
+
+  - tool_name: database_query
+    type: REJECT
+    condition: "params.query contains 'DELETE' || params.query contains 'DROP' || params.query contains 'ALTER'"
+    reason: "Destructive database operations not allowed"
+    priority: 25
+
+  - tool_name: database_query
+    type: ALLOW
+    condition: "'database_query' in user.permissions"
+    reason: "User has database query permission"
+    priority: 15
+
+  # Calendar management - generally allowed
+  - tool_name: calendar
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot access calendar"
+    priority: 10
+
+  - tool_name: calendar
+    type: ALLOW
+    condition: "user.role != 'guest'"
+    reason: "Calendar access for registered users"
+    priority: 5
+
+  # Task management - team collaboration
+  - tool_name: task_management
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot access task management"
+    priority: 10
+
+  - tool_name: task_management
+    type: REJECT
+    condition: "params.action == 'delete' && user.role != 'admin' && user.role != 'manager'"
+    reason: "Task deletion requires admin or manager privileges"
+    priority: 15
+
+  - tool_name: task_management
+    type: ALLOW
+    condition: "user.role != 'guest'"
+    reason: "Task management available to registered users"
+    priority: 5
+
+  # Analytics - role-based access
+  - tool_name: analytics
+    type: REJECT
+    condition: "user.role == 'guest' || user.role == 'user'"
+    reason: "Analytics require elevated privileges"
+    priority: 15
+
+  - tool_name: analytics
+    type: REJECT
+    condition: "params.report_type == 'sales' && user.role != 'admin' && user.role != 'manager'"
+    reason: "Sales analytics require admin or manager privileges"
+    priority: 20
+
+  - tool_name: analytics
+    type: ALLOW
+    condition: "user.role == 'admin' || user.role == 'manager' || user.role == 'developer'"
+    reason: "Analytics available to privileged users"
+    priority: 10
+
+  # Document generation - business function
+  - tool_name: document_gen
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot generate documents"
+    priority: 10
+
+  - tool_name: document_gen
+    type: REJECT
+    condition: "params.document_type == 'contract' && user.role != 'admin' && user.role != 'manager'"
+    reason: "Contract generation requires admin or manager privileges"
+    priority: 15
+
+  - tool_name: document_gen
+    type: ALLOW
+    condition: "user.role != 'guest'"
+    reason: "Document generation available to registered users"
+    priority: 5
+
+  # Notifications - controlled access
+  - tool_name: notification
+    type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests cannot send notifications"
+    priority: 15
+
+  - tool_name: notification
+    type: REJECT
+    condition: "params.type == 'sms' && user.role != 'admin' && user.role != 'manager'"
+    reason: "SMS notifications require admin or manager privileges"
+    priority: 20
+
+  - tool_name: notification
+    type: REJECT
+    condition: "len(session.previous_calls) > 20"
+    reason: "Notification rate limit exceeded"
+    priority: 10
+
+  - tool_name: notification
+    type: ALLOW
+    condition: "user.role != 'guest'"
+    reason: "Notifications available to registered users"
+    priority: 5
+
+  # Time-based restrictions for sensitive operations
+  - tool_name: user_management
+    type: REJECT
+    condition: "time.hour < 8 || time.hour > 18"
+    reason: "User management only available during business hours"
+    priority: 12
+
+  - tool_name: database_query
+    type: REJECT
+    condition: "time.hour < 8 || time.hour > 18"
+    reason: "Database access only available during business hours"
+    priority: 12
+
+  # Session-based restrictions
+  - tool_name: file_operations
+    type: REJECT
+    condition: "params.operation == 'delete' && len(session.previous_calls) > 50"
+    reason: "File deletion restricted after extensive session activity"
+    priority: 8
+
+  # IP-based restrictions (example)
+  - tool_name: user_management
+    type: REJECT
+    condition: "!request.ip.startsWith('192.168.') && !request.ip.startsWith('10.0.')"
+    reason: "User management only allowed from internal network"
+    priority: 18
+
+  # Auto-correct common typos
+  - tool_name: wheather
+    type: REWRITE
+    target: weather
+    reason: "Auto-corrected 'wheather' to 'weather'"
+    priority: 100
+
+  - tool_name: calander
+    type: REWRITE
+    target: calendar
+    reason: "Auto-corrected 'calander' to 'calendar'"
+    priority: 100
+
+  - tool_name: managment
+    type: REWRITE
+    target: user_management
+    reason: "Auto-corrected 'managment' to 'user_management'"
+    priority: 100
+
+  # Default policies
   - tool_name: "*"
     type: REJECT
+    condition: "user.role == 'guest'"
+    reason: "Guests have limited access - please register"
+    priority: 1
+
+  - tool_name: "*"
+    type: ALLOW
+    reason: "Default allow for registered users"
+    priority: 0

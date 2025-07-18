@@ -159,9 +159,9 @@ func ValidateAndPolicy(tc model.ToolCall) model.ValidationResult {
 
 	schema, ok := GetToolSchema(tc.Name)
 	if !ok {
-		// Check for REWRITE policy for this tool name
-		ptype := policy.ApplyPolicy(tc)
-		if ptype == policy.PolicyRewrite {
+		// Evaluate policy for unknown tool
+		policyResult := policy.EvaluatePolicy(tc)
+		if policyResult.Action == policy.PolicyRewrite {
 			// Fuzzy match to suggest correction
 			known := make([]string, 0, len(toolSchemas))
 			for k := range toolSchemas {
@@ -207,26 +207,40 @@ func ValidateAndPolicy(tc model.ToolCall) model.ValidationResult {
 		return result
 	}
 
-	ptype := policy.ApplyPolicy(tc)
-	result.PolicyAction = string(ptype)
-	if ptype == policy.PolicyReject {
+	// Use the new policy evaluation with context-aware conditions
+	policyResult := policy.EvaluatePolicy(tc)
+	result.PolicyAction = string(policyResult.Action)
+	result.Reason = policyResult.Reason
+
+	switch policyResult.Action {
+	case policy.PolicyReject, policy.PolicyContextReject:
 		result.Status = "rejected"
 		result.Confidence = 1.0
 		result.ExecutionAllowed = false
-		result.Reason = "Policy rejected tool call"
-	} else if ptype == policy.PolicyAllow {
+	case policy.PolicyAllow:
 		result.Status = "approved"
 		result.Confidence = 1.0
 		result.ExecutionAllowed = true
-	} else if ptype == policy.PolicyLog {
+	case policy.PolicyLog:
 		result.Status = "approved"
 		result.Confidence = 1.0
 		result.ExecutionAllowed = true
-	} else if ptype == policy.PolicyRewrite {
+	case policy.PolicyRewrite:
 		result.Status = "rewritten"
 		result.Confidence = 1.0
 		result.ExecutionAllowed = true
-		// Optionally, set result.Modifications or result.SuggestedCorrection
+		target := policyResult.Target
+		if target == "" {
+			target = tc.Name // Default to same tool if no target specified
+		}
+		result.SuggestedCorrection = &model.ToolCall{
+			ID:         tc.ID,
+			Name:       target,
+			Parameters: tc.Parameters,
+			Context:    tc.Context,
+			Timestamp:  tc.Timestamp,
+		}
+		result.Modifications = map[string]interface{}{"name": target}
 	}
 	return result
 }

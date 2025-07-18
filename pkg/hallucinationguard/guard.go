@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/SafellmHub/hguard-go/pkg/internal/core/model"
 	"github.com/SafellmHub/hguard-go/pkg/internal/core/policy"
@@ -29,6 +30,20 @@ import (
 type ToolCall struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
+	Context    *CallContext           `json:"context,omitempty"` // Optional context for conditional policies
+}
+
+// CallContext represents the context information for conditional policy evaluation
+type CallContext struct {
+	UserID          string                 `json:"user_id,omitempty"`
+	UserRole        string                 `json:"user_role,omitempty"`
+	SessionID       string                 `json:"session_id,omitempty"`
+	ConversationID  string                 `json:"conversation_id,omitempty"`
+	PreviousCalls   []string               `json:"previous_calls,omitempty"`
+	UserPermissions []string               `json:"user_permissions,omitempty"`
+	IPAddress       string                 `json:"ip_address,omitempty"`
+	TimeOfDay       int                    `json:"time_of_day,omitempty"` // Hour of day (0-23)
+	Metadata        map[string]interface{} `json:"metadata,omitempty"`    // Arbitrary context data
 }
 
 // ValidationResult represents the result of validating a tool call.
@@ -164,13 +179,38 @@ func (g *Guard) LoadPoliciesFromFile(ctx context.Context, path string) error {
 func (g *Guard) ValidateToolCall(ctx context.Context, tc ToolCall) ValidationResult {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
+
+	// Generate ID if not provided
+	callID := fmt.Sprintf("call_%d", time.Now().UnixNano())
+
+	// Convert public context to internal context
+	var internalContext model.CallContext
+	if tc.Context != nil {
+		internalContext = model.CallContext{
+			UserID:          tc.Context.UserID,
+			UserRole:        tc.Context.UserRole,
+			SessionID:       tc.Context.SessionID,
+			ConversationID:  tc.Context.ConversationID,
+			PreviousCalls:   tc.Context.PreviousCalls,
+			UserPermissions: tc.Context.UserPermissions,
+			IPAddress:       tc.Context.IPAddress,
+			TimeOfDay:       tc.Context.TimeOfDay,
+			Metadata:        tc.Context.Metadata,
+		}
+	}
+
 	// Convert to internal model
 	internalCall := model.ToolCall{
+		ID:         callID,
 		Name:       tc.Name,
 		Parameters: tc.Parameters,
+		Context:    internalContext,
+		Timestamp:  time.Now(),
 	}
+
 	// Validate using internal logic
 	result := schema.ValidateAndPolicy(internalCall)
+
 	// Convert back to public type
 	validationResult := ValidationResult{
 		ExecutionAllowed: result.ExecutionAllowed,
@@ -180,12 +220,26 @@ func (g *Guard) ValidateToolCall(ctx context.Context, tc ToolCall) ValidationRes
 		Status:           result.Status,
 		Confidence:       result.Confidence,
 	}
+
 	if result.SuggestedCorrection != nil {
+		publicContext := &CallContext{
+			UserID:          result.SuggestedCorrection.Context.UserID,
+			UserRole:        result.SuggestedCorrection.Context.UserRole,
+			SessionID:       result.SuggestedCorrection.Context.SessionID,
+			ConversationID:  result.SuggestedCorrection.Context.ConversationID,
+			PreviousCalls:   result.SuggestedCorrection.Context.PreviousCalls,
+			UserPermissions: result.SuggestedCorrection.Context.UserPermissions,
+			IPAddress:       result.SuggestedCorrection.Context.IPAddress,
+			TimeOfDay:       result.SuggestedCorrection.Context.TimeOfDay,
+			Metadata:        result.SuggestedCorrection.Context.Metadata,
+		}
 		validationResult.SuggestedCorrection = &ToolCall{
 			Name:       result.SuggestedCorrection.Name,
 			Parameters: result.SuggestedCorrection.Parameters,
+			Context:    publicContext,
 		}
 	}
+
 	return validationResult
 }
 
